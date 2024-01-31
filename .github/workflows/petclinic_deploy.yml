@@ -1,0 +1,82 @@
+name: Deploy Pet Clinic
+on: push
+jobs:
+  deploy_to_dev:
+    runs-on: ubuntu-latest
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v2
+
+#     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+#     - name: Setup Terraform
+#       uses: hashicorp/setup-terraform@v1
+
+#     - name: Terraform Init
+#       id: init
+#       run: terraform init
+#       env:
+#         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+#     # Checks that all Terraform configuration files adhere to a canonical format
+#     - name: Terraform Format
+#       id: fmt
+#       run: terraform fmt -check
+
+
+#  # Generates an execution plan for Terraform
+#     - name: Terraform Plan
+#       id: plan
+#       if: github.event_name == 'pull_request'
+#       env:
+#         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+#       run: terraform plan -no-color
+#       continue-on-error: true
+
+#     - uses: actions/github-script@0.9.0
+#       if: github.event_name == 'pull_request'
+#       env:
+#         PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+#       with:
+#         github-token: ${{ secrets.GH_TOKEN_PRIMO }}
+#         script: |
+#           const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+#           #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+#           #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+
+#           <details><summary>Show Plan</summary>
+
+#           \`\`\`${process.env.PLAN}\`\`\`
+
+#           </details>
+
+#           *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+#           github.issues.createComment({
+#             issue_number: context.issue.number,
+#             owner: context.repo.owner,
+#             repo: context.repo.repo,
+#             body: output
+#           })
+
+#     - name: Terraform Apply
+#       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+#       run: terraform apply -auto-approve -var="key_value=${{ secrets.SSH_PRIVATE_KEY_PUB }}"
+#       env:
+#         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'adopt'
+
+    - name: Build with Maven
+      run: ./mvnw package
+  
+    - name: Build Docker Image
+      run: docker build -t dev-ecr/myapp -f application/app.Dockerfile .
