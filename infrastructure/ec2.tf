@@ -31,7 +31,7 @@ resource "aws_launch_template" "ecs_lt" {
 
 resource "aws_key_pair" "webserver_key" {
   key_name   = "ecs-key"
-  public_key = file("${path.module}/webserver_dev.pub")
+  public_key = var.key_value
 }
 
 resource "aws_iam_role" "ecs_instance_role" {
