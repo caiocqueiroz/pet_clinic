@@ -82,7 +82,7 @@ jobs:
   
     - name: Build Docker Image
       run:   
-        docker build -t dev-ecr/myapp -f application/app.Dockerfile .
+        docker build -t dev-ecr/myapp -f application/app.Dockerfile application/
 
     - name: Login to Amazon ECR
       id: login-ecr
