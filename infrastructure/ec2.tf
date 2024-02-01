@@ -63,7 +63,7 @@ resource "aws_iam_instance_profile" "ecs_instance_profile" {
 
 resource "aws_autoscaling_group" "ecs_asg" {
   vpc_zone_identifier = [aws_subnet.subnet.id, aws_subnet.subnet2.id]
-  desired_capacity    = 2
+  desired_capacity    = 3
   min_size            = 1
   max_size            = 3
 
