@@ -93,8 +93,11 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
+      env:
+        AWS_REGION: 'us-east-1'
 
     - name: Push Image to Amazon ECR
       run: |
         docker tag dev-ecr/myapp:latest ${{ steps.login-ecr.outputs.registry }}/dev-ecr/myapp:latest
         docker push ${{ steps.login-ecr.outputs.registry }}/dev-ecr/myapp:latest
+
