@@ -117,6 +117,7 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_DB
 
     - name: Update ecs service
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: | 
           aws ecs update-service --cluster petclinic-cluster --service petclinic-service --force-new-deployment
 
