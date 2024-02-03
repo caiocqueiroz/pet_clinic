@@ -103,5 +103,5 @@ jobs:
 
     - name: Push Image to Amazon ECR
       run: |
-        docker tag myapp:latest ${{ steps.login-ecr.outputs.registry }}/dev-ecr/myapp:latest
-        docker push ${{ steps.login-ecr.outputs.registry }}/dev-ecr/myapp:latest
+        docker tag myapzp:latest ${{ steps.login-ecr.outputs.registry }}/dev-ecr:latest
+        docker push ${{ steps.login-ecr.outputs.registry }}/dev-ecr:latest
