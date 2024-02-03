@@ -34,6 +34,11 @@ resource "aws_ecr_repository" "myapp_repository" {
   image_tag_mutability = "MUTABLE"
 }
 
+resource "aws_cloudwatch_log_group" "ecs_log_group" {
+  name              = "/ecs/dev-ecr"
+  retention_in_days = 30 # Configure conforme necessário
+}
+
 resource "aws_ecs_task_definition" "ecs_task_definition" {
   family             = "pet-clinic-task"
   network_mode       = "awsvpc"
@@ -57,6 +62,14 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
           protocol      = "tcp"
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.ecs_log_group.name
+          awslogs-region        = "us-east-1"
+          awslogs-stream-prefix = "ecs"
+        }
+      }
     }
   ])
 }
