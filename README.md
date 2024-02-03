@@ -6,3 +6,5 @@ Pet clinica java application with backend and frontend CI/CD pipeline.
 - ECS Service
 - ECS Task
 - ECS Capacity Provider (EC2/ASG)
+
+destroy
