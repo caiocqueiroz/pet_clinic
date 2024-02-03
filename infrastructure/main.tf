@@ -59,7 +59,7 @@ resource "aws_ecs_service" "petclinic_service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = [aws_subnet.subnet, aws_subnet.subnet2]
+    subnets          = [aws_subnet.subnet.id, aws_subnet.subnet2.id]
     assign_public_ip = true
     security_groups  = [aws_security_group.security_group.id]
   }
