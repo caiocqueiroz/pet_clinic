@@ -68,11 +68,49 @@ resource "aws_ecs_task_definition" "petclinic_task" {
   ])
 }
 
+resource "aws_ecs_task_definition" "petclinic_task" {
+  family                   = "petclinic-db"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecsiamrole.arn
+  container_definitions = jsonencode([
+    {
+      name  = "petclinic-db"
+      image = "${aws_ecr_repository.ecs_repo.repository_url}/db:latest"
+      environment = [
+        { "name" : "MYSQL_ROOT_PASSWORD", "value" : "petclinic" },
+        { "name" : "MYSQL_DATABASE", "value" : "petclinic" },
+        { "name" : "MYSQL_USER", "value" : "petclinic" },
+        { "name" : "MYSQL_PASSWORD", "value" : "petclinic" }
+      ]
+      cpu       = 256
+      memory    = 512
+      essential = true
+      portMappings = [
+        {
+          containerPort = 3306
+          hostPort      = 3306
+        },
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.ecs_log_group.name
+          awslogs-region        = "us-east-1"
+          awslogs-stream-prefix = "mysql"
+        }
+      }
+    },
+  ])
+}
+
 resource "aws_ecs_service" "petclinic_service" {
   name            = "petclinic-service"
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.petclinic_task.arn
-  desired_count   = 1
+  desired_count   = 3
   launch_type     = "FARGATE"
 
   network_configuration {
@@ -207,12 +245,12 @@ resource "aws_lb_target_group" "petclinic_tg" {
 
   health_check {
     enabled             = true
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 5
+    timeout             = 30
     path                = "/"
     protocol            = "HTTP"
-    interval            = 30
+    interval            = 35
     matcher             = "200"
   }
 }
