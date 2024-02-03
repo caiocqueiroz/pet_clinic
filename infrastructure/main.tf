@@ -195,13 +195,15 @@ resource "aws_lb_listener" "front_end" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.petclinic_tg.arn
   }
+
 }
 
 resource "aws_lb_target_group" "petclinic_tg" {
-  name     = "petclinic-tg"
-  port     = 8080
-  protocol = "HTTP"
-  vpc_id   = data.terraform_remote_state.vpc.outputs.vpc_id
+  name        = "petclinic-tg"
+  port        = 8080
+  protocol    = "HTTP"
+  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
+  target_type = "ip"
 
   health_check {
     enabled             = true
