@@ -115,4 +115,4 @@ jobs:
 
     - name: Update ecs service
       run: | 
-          aws ecs update-service --cluster  petclinic --service petclinic-service --force-new-deployment
+          aws ecs update-service --cluster petclinic-cluster --service petclinic-service --force-new-deployment
