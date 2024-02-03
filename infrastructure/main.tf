@@ -144,7 +144,7 @@ resource "aws_ecs_service" "petclinic_db_service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.petclinic_tg.arn
-    container_name   = "petclinic"
+    container_name   = "petclinic-db"
     container_port   = 3306
   }
 }
