@@ -129,3 +129,79 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu_utilization" {
   ok_actions      = [aws_appautoscaling_policy.cpu_scale_out.arn]
 }
 
+resource "aws_appautoscaling_policy" "cpu_scale_in" {
+  name               = "cpu_scale_in"
+  policy_type        = "StepScaling"
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ChangeInCapacity"
+    cooldown                = 60
+    metric_aggregation_type = "Average"
+
+    step_adjustment {
+      metric_interval_upper_bound = 0
+      scaling_adjustment          = -1
+    }
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "low_cpu_utilization" {
+  alarm_name          = "low_cpu_utilization"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 40
+  alarm_description   = "This metric monitors ecs cpu utilization for scaling in"
+  datapoints_to_alarm = 2
+  dimensions = {
+    ClusterName = "petclinic-cluster"
+    ServiceName = "petclinic-service"
+  }
+  actions_enabled = true
+  alarm_actions   = [aws_appautoscaling_policy.cpu_scale_in.arn]
+}
+
+resource "aws_lb" "petclinic-alb" {
+  name               = "petclinic-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.security_group.id]
+  subnets            = [aws_subnet.subnet.id, aws_subnet.subnet2.id]
+
+  enable_deletion_protection = false
+}
+
+resource "aws_lb_listener" "front_end" {
+  load_balancer_arn = aws_lb.petclinic-alb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.petclinic_tg.arn
+  }
+}
+
+resource "aws_lb_target_group" "petclinic_tg" {
+  name     = "meu-tg"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = data.terraform_remote_state.vpc.outputs.vpc_id
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+    path                = "/"
+    protocol            = "HTTP"
+    interval            = 30
+    matcher             = "200"
+  }
+}
