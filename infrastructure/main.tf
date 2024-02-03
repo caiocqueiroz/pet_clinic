@@ -78,7 +78,7 @@ resource "aws_ecs_task_definition" "petclinic_db_task" {
   container_definitions = jsonencode([
     {
       name  = "petclinic-db"
-      image = "${aws_ecr_repository.ecs_repo.repository_url}/db:latest"
+      image = "${aws_ecr_repository.ecs_repo.repository_url}/mysql"
       environment = [
         { "name" : "MYSQL_ROOT_PASSWORD", "value" : "petclinic" },
         { "name" : "MYSQL_DATABASE", "value" : "petclinic" },
