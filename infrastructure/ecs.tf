@@ -37,7 +37,7 @@ resource "aws_ecr_repository" "myapp_repository" {
 resource "aws_ecs_task_definition" "ecs_task_definition" {
   family             = "pet-clinic-task"
   network_mode       = "awsvpc"
-  execution_role_arn = "arn:aws:iam::532199187081:role/ecsTaskExecutionRole"
+  execution_role_arn = aws_iam_role_policy_attachment.ecs_role_policy.arn
   cpu                = 256
   runtime_platform {
     operating_system_family = "LINUX"
