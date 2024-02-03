@@ -68,7 +68,7 @@ resource "aws_ecs_task_definition" "petclinic_task" {
   ])
 }
 
-resource "aws_ecs_task_definition" "petclinic_task" {
+resource "aws_ecs_task_definition" "petclinic_db__task" {
   family                   = "petclinic-db"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
