@@ -103,5 +103,5 @@ jobs:
         ECR_REPOSITORY: dev-ecr
         IMAGE_TAG: petclinic
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG application/
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f application/app.Dockerfile application/
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
