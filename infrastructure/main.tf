@@ -80,6 +80,15 @@ resource "aws_ecs_service" "petclinic_service" {
     assign_public_ip = true
     security_groups  = [aws_security_group.security_group.id]
   }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.petclinic_tg.arn
+    container_name   = "petclinic"
+    container_port   = 8080
+  }
+  depends_on = [
+    aws_lb_listener.front_end,
+  ]
 }
 
 resource "aws_appautoscaling_target" "ecs_target" {
@@ -189,7 +198,7 @@ resource "aws_lb_listener" "front_end" {
 }
 
 resource "aws_lb_target_group" "petclinic_tg" {
-  name     = "meu-tg"
+  name     = "petclinic-tg"
   port     = 8080
   protocol = "HTTP"
   vpc_id   = data.terraform_remote_state.vpc.outputs.vpc_id
