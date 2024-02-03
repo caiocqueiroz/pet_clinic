@@ -26,6 +26,10 @@ resource "aws_iam_role" "ecsiamrole" {
     ]
   })
 }
+resource "aws_cloudwatch_log_group" "ecs_log_group" {
+  name              = "/ecs/dev-ecr"
+  retention_in_days = 30 # Configure conforme necessário
+}
 
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy_attachment" {
   role       = aws_iam_role.ecsiamrole.name
@@ -52,6 +56,14 @@ resource "aws_ecs_task_definition" "petclinic_task" {
           hostPort      = 8080
         },
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.ecs_log_group.name
+          awslogs-region        = "us-east-1"
+          awslogs-stream-prefix = "ecs"
+        }
+      }
     },
   ])
 }
