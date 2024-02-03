@@ -68,7 +68,7 @@ resource "aws_ecs_task_definition" "petclinic_task" {
   ])
 }
 
-resource "aws_ecs_task_definition" "petclinic_db__task" {
+resource "aws_ecs_task_definition" "petclinic_db_task" {
   family                   = "petclinic-db"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
@@ -127,6 +127,26 @@ resource "aws_ecs_service" "petclinic_service" {
   depends_on = [
     aws_lb_listener.front_end,
   ]
+}
+
+resource "aws_ecs_service" "petclinic_db_service" {
+  name            = "petclinic-db-service"
+  cluster         = aws_ecs_cluster.ecs_cluster.id
+  task_definition = aws_ecs_task_definition.petclinic_db_task.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = [aws_subnet.subnet.id, aws_subnet.subnet2.id]
+    assign_public_ip = true
+    security_groups  = [aws_security_group.security_group.id]
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.petclinic_tg.arn
+    container_name   = "petclinic"
+    container_port   = 3306
+  }
 }
 
 resource "aws_appautoscaling_target" "ecs_target" {
